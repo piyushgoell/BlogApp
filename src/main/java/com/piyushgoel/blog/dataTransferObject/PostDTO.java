@@ -16,7 +16,7 @@ public class PostDTO {
 	private UUID id;
 	private String title;
 	private String content;
-	private String imagepath;
+	private String imagepath = "default.png";
 	private Timestamp timestamp;
 	private CategoryDTO Category;
 	private UserDTO User;

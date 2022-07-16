@@ -32,7 +32,7 @@ public class FileServiceImpl implements FileService {
 	}
 
 	@Override
-	public InputStream getImage(String path, String fileName) throws FileNotFoundException {		
+	public InputStream reteriveImage(String path, String fileName) throws FileNotFoundException {		
 		return new FileInputStream(path + File.separator + fileName);
 	}
 

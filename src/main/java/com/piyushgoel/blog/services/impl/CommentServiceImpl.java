@@ -10,6 +10,8 @@ import com.piyushgoel.blog.dataTransferObject.CommentDTO;
 import com.piyushgoel.blog.exceptions.enums.ResourceNotFoundExceptionType;
 import com.piyushgoel.blog.exceptions.impl.ResourceNotFoundException;
 import com.piyushgoel.blog.model.Comment;
+import com.piyushgoel.blog.model.Post;
+import com.piyushgoel.blog.model.User;
 import com.piyushgoel.blog.repositories.CommentRepository;
 import com.piyushgoel.blog.repositories.PostRepository;
 import com.piyushgoel.blog.services.CommentService;
@@ -27,14 +29,14 @@ public class CommentServiceImpl implements CommentService {
 	private ModelMapper modelMapper;
 
 	@Override
-	public CommentDTO create(CommentDTO comment, UUID postId) {
-		System.out.println(comment);
-		return this.modelMapper.map(
-				this.commentRepository.save(
-						this.modelMapper.map(comment,Comment.class)
-							.setPost(this.postRepository.findById(postId)
-										.orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionType.RESOURCE_NOT_FOUND,"Post","Id",postId.toString())))
-				),CommentDTO.class);
+	public void create(CommentDTO commentDTO, UUID postId, User user) {
+		Post post = this.postRepository
+						.findById(postId)
+						.orElseThrow(() -> new ResourceNotFoundException(ResourceNotFoundExceptionType.RESOURCE_NOT_FOUND,"Post","Id",postId.toString()));
+		Comment comment = this.modelMapper.map(commentDTO,Comment.class);
+		comment.setPost(post);
+		comment.setUser(user);
+		this.commentRepository.save(comment);
 		
 	}
 

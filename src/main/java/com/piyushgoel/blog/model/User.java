@@ -13,12 +13,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -30,23 +27,23 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.piyushgoel.blog.validators.NotDuplicateEmail;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name="users")
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
+@AllArgsConstructor
 public class User implements UserDetails {
 	
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(generator = "UUID")
-	@GenericGenerator(name="UUID", strategy="org.hibernate.id.UUIDGenerator")
-	@Column(name="id", columnDefinition = "BINARY(16)", updatable=false, nullable=false,unique = true)
+	@GeneratedValue(generator = "ID")
+	@GenericGenerator(name="ID", strategy="org.hibernate.id.UUIDGenerator")
+	@Column(name="id", columnDefinition = "BINARY(16)", updatable=false, nullable=false, unique = true)
 	private UUID id;
 	
 	@NotEmpty(message="Name must be min of 6 characters")
@@ -67,23 +64,18 @@ public class User implements UserDetails {
 	@NotEmpty(message="Please Provide short description about yourself")
 	@Column(name="about")
 	private String about;
-	
-	@Column(name="enabled")
-	private boolean enabled;
-	
-	@Column(name="confirmation_token", columnDefinition = "BINARY(16)", updatable=false, nullable=false,unique = true)
-	private UUID confirmationToken;
-	
+	   
+	@ManyToMany(fetch = FetchType.EAGER)
+	private Set<Role> roles = new HashSet<>();
 	
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private List<Post> posts = new ArrayList<>();
 	
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinTable(name = "user_roles",
-	    joinColumns = @JoinColumn(name = "user_id"),
-	    inverseJoinColumns = @JoinColumn(name = "role_id")
-	)
-	private Set<Role> roles = new HashSet<>();
+	@Column(name="confirmation_token", columnDefinition = "BINARY(16)", updatable=false, nullable=false, unique = true)
+	private UUID confirmationToken = UUID.randomUUID();
+	
+	@Column(name="enabled")
+	private boolean enabled = false;
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -116,6 +108,11 @@ public class User implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return this.enabled;
+	}
+
+	@Override
+	public String toString() {
+		return this.id.toString();
 	}
 	
 	

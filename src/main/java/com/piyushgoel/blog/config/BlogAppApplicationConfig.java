@@ -42,7 +42,7 @@ public class BlogAppApplicationConfig {
 
 	@EventListener
 	public void applicationReady(ApplicationReadyEvent event) {
-		if (this.roleRepository.findAll().isEmpty()) this.roleRepository.saveAllAndFlush(List.of(new Role(RoleType.ROLE_ADMIN),new Role(RoleType.ROLE_USER)));
+		if (this.roleRepository.findAll().isEmpty()) this.roleRepository.saveAllAndFlush(List.of(new Role(RoleType.ROLE_USER) ,new Role(RoleType.ROLE_ADMIN)));
 	}
 	
 }

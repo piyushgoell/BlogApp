@@ -1,55 +1,78 @@
 package com.piyushgoel.blog.contollers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
-import javax.validation.Valid;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.piyushgoel.blog.dataTransferObject.UserDTO;
+import com.piyushgoel.blog.security.annotation.IsAdmin;
+import com.piyushgoel.blog.security.annotation.IsAuthorised;
 import com.piyushgoel.blog.services.UserService;
+import com.piyushgoel.blog.swagger.UserAPI;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api/users")
-public class UserController {
+@Slf4j
+public class UserController implements UserAPI {
 
 	@Autowired
 	private UserService userService;
 	
 	
-	@PutMapping("/{id}")
-	public ResponseEntity<?> update(@Valid @RequestBody UserDTO user, @PathVariable(name = "id") UUID Id) {
-			user.setId(Id);
-		 this.userService.update(user);
-		 return new ResponseEntity<>(Map.of("message", "User Updated Sucessfully"),HttpStatus.OK);
+	@Override
+	@IsAuthorised
+	public ResponseEntity<?> getUserById(UUID Id) {
+		final Object user = this.userService.getUserById(Id);
+		return ResponseEntity.ok(user);
 	}
 	
-
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> delete(@PathVariable(name = "id") UUID Id) {
+	@Override
+	@IsAuthorised
+	public ResponseEntity<Void> update(UUID Id, UserDTO user){
+		log.info("user {} body {}", Id, user);
+		 this.userService.update(Id,user);
+		 return ResponseEntity.noContent().build();
+	}
+	
+	@Override
+	@IsAuthorised
+	public ResponseEntity<Void> delete(UUID Id) {
 		 this.userService.delete(Id);
-		 return new ResponseEntity<>(Map.of("message", "User Deleted Sucessfully"),HttpStatus.OK);
+		 return ResponseEntity.accepted().build();
 	}
 	
-	@GetMapping("/{id}")
-	public UserDTO getUserById(@PathVariable(name = "id") UUID Id) {
-		return this.userService.getUserById(Id);
+	
+	
+	@Override
+	@IsAdmin
+	public ResponseEntity<?> getUsers(String search,Integer pageNumber, Integer pageSize,List<String> sort) 
+	{
+		PageRequest pageRequest = PageRequest.of(
+				pageNumber, 
+				pageSize,
+				Sort.by(
+					sort.stream()
+						.map((s) -> new Order(
+								(s.split(";").length > 1 && (s.split(";")[1].equalsIgnoreCase("desc")) 
+										? Sort.Direction.DESC 
+										: Sort.Direction.ASC),
+								s.split(";")[0])
+							)
+						.collect(Collectors.toList()))
+				);
+		return ResponseEntity.ok(search == null 						
+				? this.userService.getAllUsers(pageRequest)
+				: this.userService.searchUsers(search, pageRequest));
+	
 	}
 	
-	@GetMapping("/")
-	public List<UserDTO> getUsers() {
-		return this.userService.getAllUsers();
-	}
 	
 }

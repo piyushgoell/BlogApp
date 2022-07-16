@@ -1,19 +1,12 @@
 package com.piyushgoel.blog.dataTransferObject;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
 public class UserDTO {
-	private UUID id;
+	
 	private String name;
 	private String email;
 	private String about;

@@ -1,36 +1,35 @@
 package com.piyushgoel.blog.contollers;
 
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.piyushgoel.blog.dataTransferObject.CommentDTO;
+import com.piyushgoel.blog.model.User;
+import com.piyushgoel.blog.security.annotation.IsAuthorised;
 import com.piyushgoel.blog.services.CommentService;
+import com.piyushgoel.blog.swagger.CommentAPI;
 
 @RestController
-@RequestMapping("/api")
-public class CommentController {
+public class CommentController implements CommentAPI{
 	
 	@Autowired
 	private CommentService commentService;
 	
-	@PostMapping("/posts/{postId}/comment")
-	public CommentDTO create(@RequestBody CommentDTO comment, @PathVariable UUID postId) {
-		return this.commentService.create(comment, postId);
+	@Override
+	@IsAuthorised
+	public ResponseEntity<?> create(CommentDTO commentDTO ,UUID postId, Authentication authentication) {
+		this.commentService.create(commentDTO, postId, (User) authentication.getPrincipal());
+		return ResponseEntity.created(null).build(); 
 	}
 	
-	@DeleteMapping("/post/{postId}/comment/{commentId}")
-	public ResponseEntity<?> delete(@PathVariable UUID postId, @PathVariable UUID commentId) {
+	@Override
+	@IsAuthorised
+	public ResponseEntity<?> delete(UUID postId,UUID commentId) {
 		this.commentService.delete(commentId);
-		return new ResponseEntity<>(Map.of("message", "Comment Deleted Sucessfully"),HttpStatus.OK);
+		return ResponseEntity.accepted().build();
 	}
 }

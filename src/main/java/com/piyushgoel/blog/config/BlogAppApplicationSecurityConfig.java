@@ -3,73 +3,85 @@ package com.piyushgoel.blog.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.piyushgoel.blog.security.JWTAuthentication;
-import com.piyushgoel.blog.security.JWTAuthenticationFilter;
+import com.piyushgoel.blog.security.BlogApplicationSecurityUtility;
+import com.piyushgoel.blog.security.filter.BlogApplicationAuthenticationFilter;
+import com.piyushgoel.blog.security.filter.BlogApplicationAuthorizationFilter;
 
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class BlogAppApplicationSecurityConfig extends WebSecurityConfigurerAdapter{
+public class BlogAppApplicationSecurityConfig{
 	
 	@Autowired
-	private UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 	
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	private JWTAuthentication jwtAuthentication;
+	private BlogApplicationAuthorizationFilter blogApplicationAutheAuthorizationFilter;
 	
 	@Autowired
-	private JWTAuthenticationFilter jwtAuthenticationFilter;
-	
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.csrf()
-			.disable()
-			.authorizeHttpRequests()
-			.antMatchers("/api/auth/**").permitAll()
-			.anyRequest()
-			.authenticated()
-			.and()
-			.exceptionHandling()
-			.authenticationEntryPoint(this.jwtAuthentication)
-			.and()
-			.sessionManagement()
-			.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-			
-		http.addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+	private BlogApplicationSecurityUtility jwtSecurityUtility;
 
-	}
+    @Bean
+    SecurityFilterChain configure(HttpSecurity http) throws Exception {
+
+        http
+                .csrf()
+                .disable()
+                .authorizeHttpRequests()
+                .antMatchers("/**").permitAll()
+				.antMatchers("/api/auth/register/**").permitAll()
+				.antMatchers("/api/auth/updatePrivileges").hasAnyAuthority("ROLE_ADMIN","ROLE_SUPER_ADMIN")
+				.anyRequest()
+				.authenticated()
+				.and()
+				.exceptionHandling()				 
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        AuthenticationManager authenticationManager = getAuthenticationManager(http.getSharedObject(AuthenticationManagerBuilder.class));
+
+        http.addFilter(getBlogApplicationAuthenticationFilter(authenticationManager))
+                .authenticationManager(authenticationManager);
+
+        http.addFilterBefore(this.blogApplicationAutheAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+
+    }
+
+
+    @Bean
+    AuthenticationManager getAuthenticationManager(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+        return authenticationManagerBuilder.build();
+    }
+	
+	protected BlogApplicationAuthenticationFilter getBlogApplicationAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
+		
+		BlogApplicationAuthenticationFilter authenticationFilter = new BlogApplicationAuthenticationFilter(authenticationManager,this.jwtSecurityUtility);
+		authenticationFilter.setFilterProcessesUrl("/api/auth/login");
+        return authenticationFilter;
+    }
 	
 	
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder);
-	}
-	
-	
-	@Override
-	@Bean
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		// TODO Auto-generated method stub
-		return super.authenticationManagerBean();
-	}
 	
 
 }
