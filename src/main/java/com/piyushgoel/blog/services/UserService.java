@@ -21,7 +21,7 @@ public interface UserService {
 	UserDTO getUserById(UUID Id);
 	UserDTO getUserByEmail(String email);
 	List<UserDTO> getAllUsers(PageRequest pageRequest);
-	List<UserDTO> searchUsers(String keyword, PageRequest pageRequest);
+	List<UserDTO> searchUsers(List<String> emails, PageRequest pageRequest);
 	
 	
 	

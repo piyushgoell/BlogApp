@@ -2,7 +2,6 @@ package com.piyushgoel.blog.swagger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Collection;
 import java.util.UUID;
 
 import javax.mail.MessagingException;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 
 import com.piyushgoel.blog.dataTransferObject.Auth;
 import com.piyushgoel.blog.dataTransferObject.UserDTO;
-import com.piyushgoel.blog.enums.RoleType;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -74,7 +71,7 @@ public interface AuthAPI {
 			@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
 			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content) })
-	@GetMapping("/activate")
+	@GetMapping("/register/activate")
 	default ResponseEntity<Void> confirmRegistration(@RequestParam("token") UUID token) {
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 		
@@ -88,23 +85,12 @@ public interface AuthAPI {
 			@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
 			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
 			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content) })
-	@PostMapping("/activate")
+	@PostMapping("/register/activate")
 	default ResponseEntity<Void> confirmRegistration(@RequestParam("token") UUID token, @RequestParam("password") String password) throws MessagingException,IOException {
 		
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
 	
-	@Operation(summary = "Update User Privileges", description = "Updates User Privileges")
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "204", description = "Updated", content = @Content),
-			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
-			@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
-			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content) })
-	@PutMapping("/updatePrivileges")
-	default ResponseEntity<Void> updateUserPrivileges(@RequestParam("username") String email, @RequestParam("claims") Collection<RoleType> claims) throws MessagingException,IOException{
-		
-		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-	}
+
 
 }

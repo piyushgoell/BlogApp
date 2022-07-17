@@ -149,14 +149,15 @@ public class UserServiceImpl implements UserService, UserDetailsService  {
 		return user;
 	}
 	
-	
-	public List<UserDTO> searchUsers(String keyword, PageRequest pageRequest) {
+	@Override
+	public List<UserDTO> searchUsers(List<String> emails, PageRequest pageRequest) {
 
-		return this.userRepository.findByEmail(keyword)
+		return this.userRepository.findAll()
 				.stream()
 				.map((post)-> this.modelMapper.map(post, UserDTO.class))
 				.collect(Collectors.toList());
 	}
+
 
 	
 

@@ -1,12 +1,16 @@
 package com.piyushgoel.blog.swagger;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.piyushgoel.blog.config.BlogAppApplicationConstants;
 import com.piyushgoel.blog.dataTransferObject.UserDTO;
+import com.piyushgoel.blog.enums.RoleType;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,7 +75,7 @@ public interface UserAPI {
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
-	@Operation(summary = "Get Users", description = "")
+	@Operation(summary = "Search Users", description = "")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
 			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
@@ -79,11 +84,25 @@ public interface UserAPI {
 			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content) })
 	@GetMapping("/")
 	default ResponseEntity<?> getUsers(
-			@Parameter(example = "piyushgoel.in@gmail.com") @RequestParam(value = "search" , required = false) String search,
+			@Parameter(example = "piyushgoel.in@gmail.com") @RequestParam(value = "email" , required = false) List<String> emails,
 			@RequestParam(value = "pageNumber", defaultValue = BlogAppApplicationConstants.DEFAULT_PAGE_NUMBER, required = false) Integer pageNumber,
 			@RequestParam(value = "pageSize", defaultValue = BlogAppApplicationConstants.DEFAULT_PAGE_SIZE, required = false) Integer pageSize,
-			@RequestParam(value = "sort", defaultValue=BlogAppApplicationConstants.DEFAULT_EMPTY_STRING, required = false ) List<String> sort
+			@RequestParam(value = "sort", defaultValue=BlogAppApplicationConstants.DEFAULT_EMPTY_STRING, required = false ) List<String> sort,
+			Authentication authentication
 			) {
+		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+	}
+	
+	@Operation(summary = "Update User Privileges", description = "Updates User Privileges")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "204", description = "Updated", content = @Content),
+			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+			@ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content) })
+	@PutMapping("/updatePrivileges")
+	default ResponseEntity<Void> updateUserPrivileges(@RequestParam("username") String email, @RequestParam("claims") Collection<RoleType> claims) throws MessagingException,IOException{
+		
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
 	

@@ -112,8 +112,12 @@ public class User implements UserDetails {
 
 	@Override
 	public String toString() {
-		return this.id.toString();
+		return "User [id=" + id + ", name=" + name + ", email=" + email + ", password=" + password + ", about=" + about
+				+ ", roles=" + roles + ", confirmationToken=" + confirmationToken + ", enabled="
+				+ enabled + "]";
 	}
+	
+	
 	
 	
 }

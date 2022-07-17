@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize(value = "(hasAuthority('ROLE_USER') and authentication.principal.id.equals(#Id))"
+@PreAuthorize(value = "(hasAuthority('ROLE_USER') and (authentication.principal.id.equals(#Id) or authentication.principal.email.equals(#emails[0])))"
 		+ " or "
 		+ "hasAuthority('ROLE_ADMIN')"
 		+ " or "

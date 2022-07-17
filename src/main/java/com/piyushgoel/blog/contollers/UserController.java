@@ -1,17 +1,23 @@
 package com.piyushgoel.blog.contollers;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.piyushgoel.blog.dataTransferObject.UserDTO;
+import com.piyushgoel.blog.enums.RoleType;
 import com.piyushgoel.blog.security.annotation.IsAdmin;
 import com.piyushgoel.blog.security.annotation.IsAuthorised;
 import com.piyushgoel.blog.services.UserService;
@@ -53,8 +59,9 @@ public class UserController implements UserAPI {
 	
 	@Override
 	@IsAdmin
-	public ResponseEntity<?> getUsers(String search,Integer pageNumber, Integer pageSize,List<String> sort) 
+	public ResponseEntity<?> getUsers(List<String> emails,Integer pageNumber, Integer pageSize,List<String> sort, Authentication authentication) 
 	{
+		
 		PageRequest pageRequest = PageRequest.of(
 				pageNumber, 
 				pageSize,
@@ -68,10 +75,17 @@ public class UserController implements UserAPI {
 							)
 						.collect(Collectors.toList()))
 				);
-		return ResponseEntity.ok(search == null 						
+		return ResponseEntity.ok(emails.isEmpty()					
 				? this.userService.getAllUsers(pageRequest)
-				: this.userService.searchUsers(search, pageRequest));
+				: this.userService.searchUsers(emails, pageRequest));
 	
+	}
+	
+	@Override
+	@IsAdmin
+	public ResponseEntity<Void> updateUserPrivileges(String email, Collection<RoleType> claims) throws MessagingException,IOException{
+		this.userService.update(email,claims);
+		return ResponseEntity.noContent().build();
 	}
 	
 	

@@ -18,12 +18,15 @@ import com.piyushgoel.blog.security.BlogApplicationSecurityUtility;
 import com.piyushgoel.blog.security.filter.BlogApplicationAuthenticationFilter;
 import com.piyushgoel.blog.security.filter.BlogApplicationAuthorizationFilter;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@SecurityScheme(name = "Bearer Authentication",type = SecuritySchemeType.HTTP,bearerFormat = "JWT",scheme = "bearer")
 public class BlogAppApplicationSecurityConfig{
 	
 	@Autowired

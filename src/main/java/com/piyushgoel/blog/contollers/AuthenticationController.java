@@ -2,7 +2,6 @@ package com.piyushgoel.blog.contollers;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Collection;
 import java.util.UUID;
 
 import javax.mail.MessagingException;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import com.piyushgoel.blog.dataTransferObject.UserDTO;
-import com.piyushgoel.blog.enums.RoleType;
 import com.piyushgoel.blog.services.UserService;
 import com.piyushgoel.blog.swagger.AuthAPI;
 
@@ -31,7 +29,7 @@ public class AuthenticationController implements AuthAPI{
 	
 	@Override
 	public ResponseEntity<Void> create(UserDTO user,HttpServletRequest request) throws MalformedURLException, MessagingException,IOException {
-		user = this.userService.create(user, request.getRequestURL().append("/activation").toString());
+		user = this.userService.create(user, request.getRequestURL().append("/activate").toString());
 		return ResponseEntity.created(null).build();
 	}
 	
@@ -49,9 +47,5 @@ public class AuthenticationController implements AuthAPI{
 		 return ResponseEntity.noContent().build();
 	}
 	
-	@Override
-	public ResponseEntity<Void> updateUserPrivileges(String email, Collection<RoleType> claims) throws MessagingException,IOException{
-		this.userService.update(email,claims);
-		return ResponseEntity.noContent().build();
-	}
+	
 }

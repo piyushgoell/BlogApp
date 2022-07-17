@@ -46,7 +46,6 @@ public class CategoryController implements CategoryAPI {
 	
 	@Override
 	public ResponseEntity<?> getCategories(String search,Integer pageNumber, Integer pageSize, List<String> sort) {
-		
 		List<Order> sort1 = sort.stream()
 				.map((s) -> new Order(
 						(s.split(";").length > 1 && (s.split(";")[1].equalsIgnoreCase(Sort.Direction.DESC.name())) 
