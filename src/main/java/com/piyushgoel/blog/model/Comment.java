@@ -32,7 +32,7 @@ public class Comment {
 	@Id
 	@GeneratedValue(generator = "UUID")
 	@GenericGenerator(name="UUID", strategy="org.hibernate.id.UUIDGenerator")
-	@Column(name="id", columnDefinition = "BINARY(16)", updatable=false, nullable=false)
+	@Column(name="id", updatable=false, nullable=false)
 	private UUID id;
 	
 	private String comment;

@@ -43,7 +43,7 @@ public class User implements UserDetails {
 	@Id
 	@GeneratedValue(generator = "ID")
 	@GenericGenerator(name="ID", strategy="org.hibernate.id.UUIDGenerator")
-	@Column(name="id", columnDefinition = "BINARY(16)", updatable=false, nullable=false, unique = true)
+	@Column(name="id", updatable=false, nullable=false, unique = true)
 	private UUID id;
 	
 	@NotEmpty(message="Name must be min of 6 characters")
@@ -71,7 +71,7 @@ public class User implements UserDetails {
 	@OneToMany(mappedBy="user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private List<Post> posts = new ArrayList<>();
 	
-	@Column(name="confirmation_token", columnDefinition = "BINARY(16)", updatable=false, nullable=false, unique = true)
+	@Column(name="confirmation_token", updatable=false, nullable=false, unique = true)
 	private UUID confirmationToken = UUID.randomUUID();
 	
 	@Column(name="enabled")
