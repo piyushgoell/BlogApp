@@ -29,6 +29,7 @@ public class AuthenticationController implements AuthAPI{
 	
 	@Override
 	public ResponseEntity<Void> create(UserDTO user,HttpServletRequest request) throws MalformedURLException, MessagingException,IOException {
+		
 		user = this.userService.create(user, request.getRequestURL().append("/activate").toString());
 		return ResponseEntity.created(null).build();
 	}
