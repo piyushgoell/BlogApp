@@ -79,3 +79,4 @@ secrets.yml
 *.jar
 .mvn/wrapper/*
 images/*
+src/main/resources/application.properties
